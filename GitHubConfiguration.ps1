@@ -288,7 +288,8 @@ function Get-GitHubConfiguration
             'RetryDelaySeconds',
             'SuppressNoTokenWarning',
             'SuppressTelemetryReminder',
-            'WebRequestTimeoutSec')]
+            'WebRequestTimeoutSec',
+            'TestConfigSettingsHash')]
         [string] $Name
     )
 
@@ -625,6 +626,7 @@ function Import-GitHubConfiguration
         'suppressNoTokenWarning' = $false
         'suppressTelemetryReminder' = $false
         'webRequestTimeoutSec' = 0
+        'testConfigSettingsHash' = '01A90E60702A9DB6ED4F6BD7E0A44F2D5B5FE67AB3055127507E89C3E181404E4A260963D9581764886AA27CA9F93A8B360B8C5056A1CD0E6703AC6C56C6359E'
     }
 
     $jsonObject = Read-GitHubConfiguration -Path $Path

@@ -37,19 +37,21 @@ function Initialize-CommonTestSetup
     . $settingsPath
     Import-Module -Name (Join-Path -Path $moduleRootPath -ChildPath 'PowerShellForGitHub.psd1') -Force
 
-    $originalSettingsSha256Hash = "944D5BB450AD2C49F77DAE6C472FEF774B108CD2CB6A0DBF45EF4BBB7FE25D56"
-    $currentSettingsSha256Hash = (Get-FileHash -Path $settingsPath -Algorithm SHA256).Hash
-    $isSettingsUnaltered = $originalSettingsSha256Hash -eq $currentSettingsSha256Hash
+    $originalSettingsHash = (Get-GitHubConfiguration -Name TestConfigSettingsHash)
+    $currentSettingsHash = Get-SHA512Hash -PlainText (Get-Content -Path $settingsPath -Raw)
+    $settingsAreUnaltered = $originalSettingsHash -eq $currentSettingsHash
 
-    if ([string]::IsNullOrEmpty($env:ciAccessToken) -and $isSettingsUnaltered)
+    if ([string]::IsNullOrEmpty($env:ciAccessToken))
     {
-        $message = @(
-            'The tests are using the configuration settings defined in Tests\Config\Settings.ps1.',
-            'If you haven''t locally modified those values, your tests are going to fail since you',
-            'don''t have access to the default accounts referenced.  If that is the case, you should',
-            'cancel the existing tests, modify the values to ones you have access to, call',
-            'Set-GitHubAuthentication to cache your AccessToken, and then try running the tests again.')
-        Write-Warning -Message ($message -join [Environment]::NewLine)
+        if ($settingsAreUnaltered) {
+            $message = @(
+                'The tests are using the configuration settings defined in Tests\Config\Settings.ps1.',
+                'If you haven''t locally modified those values, your tests are going to fail since you',
+                'don''t have access to the default accounts referenced.  If that is the case, you should',
+                'cancel the existing tests, modify the values to ones you have access to, call',
+                'Set-GitHubAuthentication to cache your AccessToken, and then try running the tests again.')
+            Write-Warning -Message ($message -join [Environment]::NewLine)
+        }
     }
     else
     {
