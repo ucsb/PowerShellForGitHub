@@ -33,19 +33,19 @@ function Initialize-CommonTestSetup
     param()
 
     $moduleRootPath = Split-Path -Path $PSScriptRoot -Parent
-    $settingsPath = Join-Path -Path $moduleRootPath -ChildPath 'Tests\Config\Settings.ps1'
+    $settingsPath = Join-Path -Path $moduleRootPath -ChildPath 'Tests/Config/Settings.ps1'
     . $settingsPath
     Import-Module -Name (Join-Path -Path $moduleRootPath -ChildPath 'PowerShellForGitHub.psd1') -Force
 
     $originalSettingsHash = (Get-GitHubConfiguration -Name TestConfigSettingsHash)
-    $currentSettingsHash = Get-SHA512Hash -PlainText (Get-Content -Path $settingsPath -Raw)
+    $currentSettingsHash = Get-SHA512Hash -PlainText (Get-Content -Path $settingsPath -Raw -Encoding Utf8)
     $settingsAreUnaltered = $originalSettingsHash -eq $currentSettingsHash
 
     if ([string]::IsNullOrEmpty($env:ciAccessToken))
     {
         if ($settingsAreUnaltered) {
             $message = @(
-                'The tests are using the configuration settings defined in Tests\Config\Settings.ps1.',
+                'The tests are using the configuration settings defined in Tests/Config/Settings.ps1.',
                 'If you haven''t locally modified those values, your tests are going to fail since you',
                 'don''t have access to the default accounts referenced.  If that is the case, you should',
                 'cancel the existing tests, modify the values to ones you have access to, call',
