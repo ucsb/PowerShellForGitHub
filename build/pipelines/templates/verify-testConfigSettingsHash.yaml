@@ -10,26 +10,29 @@ steps:
       $content = Get-Content -Path ./Tests/Config/Settings.ps1 -Raw -Encoding UTF8
       $hash = Get-SHA512Hash -PlainText $content
       $configurationFile = Get-Content -Path ./GitHubConfiguration.ps1 -Raw -Encoding Utf8
-      if($configurationFile -match "'testConfigSettingsHash' = '([^']+)'") {
-        if($hash -ne $Matches[1]) {
+      if($configurationFile -match "'testConfigSettingsHash' = '([^']+)'")
+      {
+        if($hash -ne $Matches[1])
+        {
           $configHash = $Matches[1]
-          throw (
-            "`$testConfigSettingsHash value does not match the Get-SHA512Hash of file ./Tests/Config/Settings.ps1. If the contents of " +
-            "Settings.ps1 has been updated, please update the `$testConfigSettingsHash value in ./GitHubConfiguration.ps1's " +
-			      "Import-GitHubConfiguration function. You can generate the new hash value using the commands: `r`n" +
-            "`r`n" +
-            "`t. ./Helpers.ps1`r`n" +
-            "`tGet-SHA512Hash -PlainText (Get-Content -Path ./Tests/Config/Settings.ps1 -Raw -Encoding Utf8) `r`n" +
-            "`r`n" +
-            "`$testConfigSettingsHash = $configHash`r`n" +
-            "Get-SHA512Hash(Settings.ps1) = $hash"
-          )
+          $message = @(
+            "`$testConfigSettingsHash value does not match the Get-SHA512Hash of file ./Tests/Config/Settings.ps1. If the contents of ",
+            "Settings.ps1 has been updated, please update the `$testConfigSettingsHash value in ./GitHubConfiguration.ps1's ",
+            "Import-GitHubConfiguration function. You can generate the new hash value using the commands:",
+            "",
+            "`t. ./Helpers.ps1",
+            "`tGet-SHA512Hash -PlainText (Get-Content -Path ./Tests/Config/Settings.ps1 -Raw -Encoding Utf8)",
+            "",
+            "`$testConfigSettingsHash = $configHash",
+            "Get-SHA512Hash(Settings.ps1) = $hash")
+          throw ($message -join [Environment]::NewLine)
         }
-      } else {
-        throw (
-          "`$testConfigSettingsHash value not found in ./GitHubConfiguration.ps1. Please ensure " +
-          "the default hash value is set within the Import-GitHubConfiguration function."
-        )
+      } else
+      {
+        $message = @(
+          "`$testConfigSettingsHash value not found in ./GitHubConfiguration.ps1. Please ensure ",
+          "the default hash value is set within the Import-GitHubConfiguration function.")
+        throw ($message -join [Environment]::NewLine)
       }
     displayName: 'Set GitHubConfiguration.ps1 testConfigSettingsHash value.' 
 

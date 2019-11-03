@@ -43,7 +43,8 @@ function Initialize-CommonTestSetup
 
     if ([string]::IsNullOrEmpty($env:ciAccessToken))
     {
-        if ($settingsAreUnaltered) {
+        if ($settingsAreUnaltered)
+        {
             $message = @(
                 'The tests are using the configuration settings defined in Tests/Config/Settings.ps1.',
                 'If you haven''t locally modified those values, your tests are going to fail since you',
@@ -55,16 +56,14 @@ function Initialize-CommonTestSetup
     }
     else
     {
-        if(-not [string]::IsNullOrEmpty($env:ciAccessToken)) {
-            $secureString = $env:ciAccessToken | ConvertTo-SecureString -AsPlainText -Force
-            $cred = New-Object System.Management.Automation.PSCredential "<username is ignored>", $secureString
-            Set-GitHubAuthentication -Credential $cred
+        $secureString = $env:ciAccessToken | ConvertTo-SecureString -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential "<username is ignored>", $secureString
+        Set-GitHubAuthentication -Credential $cred
 
-            $script:ownerName = $env:ciOwnerName
-            $script:organizationName = $env:ciOrganizationName
+        $script:ownerName = $env:ciOwnerName
+        $script:organizationName = $env:ciOrganizationName
 
-            Write-Warning -Message 'This run is being executed in the Azure Dev Ops environment.'
-        }
+        Write-Warning -Message 'This run is being executed in the Azure Dev Ops environment.'
     }
 
     $script:accessTokenConfigured = Test-GitHubAuthenticationConfigured
